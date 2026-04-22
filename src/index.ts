@@ -1,9 +1,8 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness.js"
-import { middlewareLogResponses } from "./api/middleware.js"
-import { middlewareMetricsInc } from "./api/fileHits.js";
-import { handlerHits } from "./api/handlerHits.js";
-import { handlerReset } from "./api/handlerReset.js"
+import { middlewareMetricsInc, middlewareLogResponses } from "./api/middleware.js"
+import { handlerHits } from "./api/metrics.js";
+import { handlerReset } from "./api/reset.js"
 
 const app = express();
 const PORT = 8080;
