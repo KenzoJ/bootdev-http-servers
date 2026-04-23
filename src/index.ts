@@ -10,6 +10,7 @@ const PORT = 8080;
 
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.use(middlewareLogResponses);
+app.use(express.json())
 
 //API
 app.use("/api", express.static("./src/api"));
