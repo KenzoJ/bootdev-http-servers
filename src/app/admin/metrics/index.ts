@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { config } from "../../../api/config.js";
+import { config } from "../../../config.js";
 
 export async function handlerHits(_: Request, res: Response) {
   res.set("Content-Type", "text/html; charset=utf-8");

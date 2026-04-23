@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { config } from "./config.js"
+import { config } from "../config.js";
 import { NotFoundError, Unauthorized, BadRequest, Forbidden } from "./errors.js";
 import { respondWithError } from "./json.js";
 
