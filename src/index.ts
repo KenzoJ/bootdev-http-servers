@@ -3,6 +3,7 @@ import { handlerReadiness } from "./api/readiness.js"
 import { middlewareMetricsInc, middlewareLogResponses, errorMiddleware } from "./api/middleware.js"
 import { handlerHits } from "./app/admin/metrics/index.js";
 import { handlerReset } from "./app/admin/metrics/reset.js"
+import { handlerUsers } from "./api/users.js"
 import { handlerChirpsValidate } from "./api/chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
@@ -20,8 +21,8 @@ app.use(express.json())
 
 //API
 app.use("/api", express.static("./src/api"));
+app.post("/api/users", handlerUsers)
 app.get("/api/healthz", handlerReadiness);
-//app.post("/api/validate_chirp", handlerChirpsValidate)
 app.post("/api/validate_chirp", async (req, res, next) => {
   try {
     await handlerChirpsValidate(req, res);

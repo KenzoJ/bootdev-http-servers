@@ -8,12 +8,6 @@ export async function handlerChirpsValidate(req: Request, res: Response) {
     body: string;
   };
 
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk;
-  });
-
   const params: parameters = req.body;
 
   const maxChirpLength = 140;

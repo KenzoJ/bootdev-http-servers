@@ -8,3 +8,8 @@ export async function createUser(user: NewUser) {
     .returning();
   return result;
 }
+
+export async function deleteUsers() {
+  const result = await db.delete(users);
+  return result;
+}
