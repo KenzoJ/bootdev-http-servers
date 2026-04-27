@@ -1,16 +1,17 @@
 import type { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
-import { BadRequest } from "./errors.js";
-import { createChirp } from "../db/queries/chirps.js";
+import { BadRequest, Forbidden } from "./errors.js";
+import { createChirp, getAllPosts } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
+
 
 export type Parameters = {
   body: string;
   userId: string;
 };
 
-export async function handlerChirpsValidate(req: Request, res: Response) {
+export async function handlerChirpsCreate(req: Request, res: Response) {
 
   const params: Parameters = req.body;
 
@@ -37,6 +38,20 @@ export async function handlerChirpsValidate(req: Request, res: Response) {
   respondWithJSON(res, 201, newChirp)
 }
 
+export async function handlerGetAllChirps(_: Request, res: Response) {
+  const allPosts = await getAllPosts()
+
+  if (typeof allPosts === 'undefined') {
+    throw new Forbidden("No posts to get")
+  }
+
+  for (let i = 0; allPosts.length < i; i++) {
+    console.log(allPosts[i])
+  }
+
+  respondWithJSON(res, 200, allPosts)
+}
+
 function checkProfanities(input: string): string {
   const badWords = ["kerfuffle", "sharbert", "fornax"]
 
@@ -59,3 +74,4 @@ function isParameters(value: unknown): value is Parameters {
     typeof (value as any).userId === 'string'
   );
 }
+
