@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
-import { respondWithJSON } from "./json.js";
-import { BadRequest, Forbidden } from "./errors.js";
-import { createChirp, getAllPosts } from "../db/queries/chirps.js";
+import { respondWithError, respondWithJSON } from "./json.js";
+import { BadRequest, Forbidden, NotFoundError } from "./errors.js";
+import { getChirp, createChirp, getAllPosts } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
+
 
 
 export type Parameters = {
@@ -51,6 +52,23 @@ export async function handlerGetAllChirps(_: Request, res: Response) {
 
   respondWithJSON(res, 200, allPosts)
 }
+
+export async function handlerGetChirp(req: Request, res: Response) {
+  const { chirpId } = req.params;
+
+  if (typeof chirpId !== "string") {
+    throw new BadRequest("Invalid chirp id")
+  }
+
+  const chirp = await getChirp(chirpId);
+
+  if (!chirp) {
+    throw new NotFoundError(`Chirp with chirpId: ${chirpId} not found`);
+  }
+  respondWithJSON(res, 200, chirp)
+}
+
+
 
 function checkProfanities(input: string): string {
   const badWords = ["kerfuffle", "sharbert", "fornax"]

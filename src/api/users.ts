@@ -16,21 +16,15 @@ export async function handlerUsersCreate(req: Request, res: Response) {
   const params: parameters = req.body;
 
   //check if user exists
-  const userExists = await getUser(params.email)
-  if (typeof userExists === "object") {
-    console.log("User already exists")
-    throw new Forbidden("User access")
-  }
+  //const userExists = await getUser(params.email)
+  //if (typeof userExists === "object") {
+  //console.log("User already exists")
+  //throw new Forbidden("User access")
+  //}
 
   //create new if not
   const newUser = await createUser({ email: params.email });
 
-  respondWithJSON(res, 201, {
-    id: newUser.id,
-    email: newUser.email,
-    createdAt: newUser.createdAt,
-    updatedAt: newUser.updatedAt
-  }
-  )
+  respondWithJSON(res, 201, newUser)
 
 }
