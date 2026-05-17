@@ -15,6 +15,13 @@
       "when": 1777318317874,
       "tag": "0001_shallow_dreaming_celestial",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779050345508,
+      "tag": "0002_shocking_marvel_zombies",
+      "breakpoints": true
     }
   ]
 }
