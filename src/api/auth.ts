@@ -35,3 +35,12 @@ export async function handlerLogin(req: Request, res: Response) {
   } satisfies UserResponse);
 }
 
+export function getBearerToken(req: Request): string {
+  const header = req.app.get('Authorization');
+  if (!header) {
+    throw new Unauthorized("No auth");
+  }
+  const sanitized = header.slice(7)
+  console.log(sanitized)
+  return sanitized;
+}
