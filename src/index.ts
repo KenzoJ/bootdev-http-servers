@@ -22,7 +22,6 @@ app.use(middlewareLogResponses);
 app.use(express.json())
 
 //API
-app.use("/api", express.static("./src/api"));
 app.post("/api/users", async (req, res, next) => {
   try {
     await handlerUsersCreate(req, res);
@@ -31,6 +30,7 @@ app.post("/api/users", async (req, res, next) => {
   }
 })
 app.post("/api/login", (req, res, next) => {
+  console.log("Hit login API")
   Promise.resolve(handlerLogin(req, res)).catch(next);
 });
 app.get("/api/healthz", handlerReadiness);

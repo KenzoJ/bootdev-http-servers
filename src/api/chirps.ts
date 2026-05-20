@@ -4,21 +4,22 @@ import { BadRequest, Forbidden, NotFoundError } from "./errors.js";
 import { getChirp, createChirp, getAllPosts } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
+import { getBearerToken } from "./auth.js";
+import { validateJWT } from "../auth.js";
+import { config } from "../config.js";
 
 
 
 export type Parameters = {
   body: string;
-  userId: string;
 };
 
 export async function handlerChirpsCreate(req: Request, res: Response) {
 
-  const params: Parameters = req.body;
+  const bearerToken = getBearerToken(req)
+  const userId = validateJWT(bearerToken, config.secret);
 
-  if (!isParameters(req.body)) {
-    throw new BadRequest("Need valid JSON")
-  }
+  const params: Parameters = req.body;
 
   const maxChirpLength = 140;
   if (params.body.length > maxChirpLength) {
@@ -26,13 +27,9 @@ export async function handlerChirpsCreate(req: Request, res: Response) {
   }
   const cleaned = checkProfanities(params.body)
 
-  if (typeof getUserById(params.userId) === 'undefined') {
-    throw new BadRequest("Unknown user by that Id")
-  }
-
   const newChirp: NewChirp = await createChirp({
     body: cleaned,
-    userId: params.userId
+    userId: userId
   })
 
 
@@ -88,8 +85,7 @@ function isParameters(value: unknown): value is Parameters {
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).body === 'string' &&
-    typeof (value as any).userId === 'string'
+    typeof (value as any).body === 'string'
   );
 }
 
