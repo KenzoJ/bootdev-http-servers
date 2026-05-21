@@ -3,7 +3,7 @@ import { handlerReadiness } from "./api/readiness.js"
 import { middlewareMetricsInc, middlewareLogResponses, errorMiddleware } from "./api/middleware.js"
 import { handlerHits } from "./app/admin/metrics/index.js";
 import { handlerReset } from "./app/admin/metrics/reset.js"
-import { handlerLogin } from "./api/auth.js";
+import { handlerLogin, handlerRefresh } from "./api/auth.js";
 import { handlerUsersCreate } from "./api/users.js"
 import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps } from "./api/chirps.js";
 import postgres from "postgres";
@@ -30,8 +30,10 @@ app.post("/api/users", async (req, res, next) => {
   }
 })
 app.post("/api/login", (req, res, next) => {
-  console.log("Hit login API")
   Promise.resolve(handlerLogin(req, res)).catch(next);
+});
+app.post("/api/refresh", (req, res, next) => {
+  Promise.resolve(handlerRefresh(req, res)).catch(next);
 });
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/chirps", (req, res, next) => {

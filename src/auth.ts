@@ -38,9 +38,9 @@ export function validateJWT(tokenString: string, secret: string): string {
 }
 //
 
-export function makeJWT(userID: string, expiresIn: number, secret: string): string {
+export function makeJWT(userID: string, secret: string): string {
   const issuesAt = Math.floor(Date.now() / 1000)
-  const expiresAt = issuesAt + expiresIn;
+  const expiresAt = issuesAt + 3600;
   const token = jwt.sign({
     iss: "chirpy",
     sub: userID,

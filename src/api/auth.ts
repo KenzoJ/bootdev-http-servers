@@ -4,13 +4,15 @@ import { respondWithJSON } from "./json.js";
 import { Unauthorized } from "./errors.js";
 import { makeJWT } from "../auth.js";
 import { config } from "../config.js";
-
+import { randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import type { UserResponse } from "./users.js";
+import { addRefreshToken } from "../db/queries/tokens.js";
 
 
 type LoginResponse = UserResponse & {
   token: string;
+  refreshToken: string;
 }
 
 export async function handlerLogin(req: Request, res: Response) {
@@ -35,11 +37,8 @@ export async function handlerLogin(req: Request, res: Response) {
     throw new Unauthorized("incorrect email or password");
   }
 
-  if (!params.expiresInSeconds || params.expiresInSeconds > 3600) {
-    params.expiresInSeconds = 3600;
-  }
-
-  const token = makeJWT(user.id, params.expiresInSeconds, config.secret);
+  const token = makeJWT(user.id, config.secret);
+  const refreshToken = makeRefreshToken()
 
   respondWithJSON(res, 200, {
     id: user.id,
@@ -47,6 +46,7 @@ export async function handlerLogin(req: Request, res: Response) {
     updatedAt: user.updatedAt,
     email: user.email,
     token: token,
+    refreshToken: refreshToken,
   } satisfies LoginResponse);
 }
 
@@ -57,4 +57,11 @@ export function getBearerToken(req: Request): string {
   }
   const sanitized = header.replace("Bearer ", "").trim()
   return sanitized;
+}
+
+export function makeRefreshToken() {
+  const buf = randomBytes(256);
+  const token = buf.toString("hex");
+  addRefreshToken(token)
+  return token;
 }
