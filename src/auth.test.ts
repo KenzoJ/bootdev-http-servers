@@ -31,7 +31,7 @@ describe("JWT Funct", () => {
   let validToken: string;
 
   beforeAll(() => {
-    validToken = makeJWT(userId, 3600, secret);
+    validToken = makeJWT(userId, secret);
   });
 
   it("should validate valid token", () => {

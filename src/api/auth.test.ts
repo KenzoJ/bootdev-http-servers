@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from 'vitest';
-import { getBearerToken } from './auth.js';
+import { getBearerToken } from '../auth.js';
 import { Unauthorized } from './errors.js';
 
 describe("getBearerToken", () => {

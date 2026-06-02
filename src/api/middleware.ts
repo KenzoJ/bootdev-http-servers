@@ -14,7 +14,7 @@ export async function middlewareLogResponses(req: Request, res: Response, next: 
 }
 
 export async function middlewareMetricsInc(req: Request, res: Response, next: NextFunction) {
-  console.log("middleware runs!");
+  //console.log("middleware runs!");
   config.api.fileserverHits++;
   console.log(`File Server Hits: ${config.api.fileserverHits}`)
   next();

@@ -2,6 +2,9 @@ import * as argon2 from "argon2";
 import { Unauthorized } from "./api/errors.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
+import { addRefreshToken } from "./db/queries/tokens.js";
+import { randomBytes } from "node:crypto";
+import type { Request } from "express";
 
 export async function hashPassword(password: string): Promise<string> {
   try {
@@ -22,6 +25,7 @@ export async function checkPasswordHash(password: string, hash: string): Promise
 }
 
 export function validateJWT(tokenString: string, secret: string): string {
+  //console.log(tokenString, "tokenstring:")
   let decoded: payload;
   try {
     decoded = jwt.verify(tokenString, secret) as JwtPayload;
@@ -35,6 +39,13 @@ export function validateJWT(tokenString: string, secret: string): string {
     throw new Unauthorized("No user Id in token")
   }
   return decoded.sub
+}
+
+export function makeRefreshToken(userId: string) {
+  const buf = randomBytes(256);
+  const token = buf.toString("hex");
+  addRefreshToken(token, userId)
+  return token;
 }
 //
 
@@ -53,4 +64,12 @@ export function makeJWT(userID: string, secret: string): string {
   return token;
 }
 
+export function getBearerToken(req: Request): string {
+  const header = req.get('Authorization');
+  if (!header) {
+    throw new Unauthorized("No auth");
+  }
+  const sanitized = header.replace("Bearer ", "").trim()
+  return sanitized;
+}
 

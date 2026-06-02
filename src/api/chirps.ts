@@ -4,7 +4,7 @@ import { BadRequest, Forbidden, NotFoundError } from "./errors.js";
 import { getChirp, createChirp, getAllPosts } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
-import { getBearerToken } from "./auth.js";
+import { getBearerToken } from "../auth.js";
 import { validateJWT } from "../auth.js";
 import { config } from "../config.js";
 

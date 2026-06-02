@@ -1,13 +1,14 @@
 import { getUserByEmail } from "../db/queries/users.js";
-import { checkPasswordHash } from "../auth.js";
+import { checkPasswordHash, getBearerToken } from "../auth.js";
 import { respondWithJSON } from "./json.js";
-import { Unauthorized } from "./errors.js";
+import { BadRequest, Forbidden, Unauthorized } from "./errors.js";
 import { makeJWT } from "../auth.js";
 import { config } from "../config.js";
-import { randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
 import type { UserResponse } from "./users.js";
-import { addRefreshToken } from "../db/queries/tokens.js";
+import { makeRefreshToken } from "../auth.js";
+import { getUserFromRefreshToken, revokeToken } from "../db/queries/tokens.js";
+import { NewRefreshToken } from "../db/schema.js";
 
 
 type LoginResponse = UserResponse & {
@@ -19,7 +20,6 @@ export async function handlerLogin(req: Request, res: Response) {
   type parameters = {
     password: string;
     email: string;
-    expiresInSeconds?: number;
   };
 
   const params: parameters = req.body;
@@ -38,7 +38,7 @@ export async function handlerLogin(req: Request, res: Response) {
   }
 
   const token = makeJWT(user.id, config.secret);
-  const refreshToken = makeRefreshToken()
+  const refreshToken = makeRefreshToken(user.id)
 
   respondWithJSON(res, 200, {
     id: user.id,
@@ -50,18 +50,33 @@ export async function handlerLogin(req: Request, res: Response) {
   } satisfies LoginResponse);
 }
 
-export function getBearerToken(req: Request): string {
-  const header = req.get('Authorization');
-  if (!header) {
-    throw new Unauthorized("No auth");
+
+export async function handlerRefreshToken(req: Request, res: Response) {
+  const refreshToken = getBearerToken(req)
+
+  if (!refreshToken) { throw new BadRequest("Token does not exist") }
+
+  const user = await getUserFromRefreshToken(refreshToken)
+  if (!user) { throw new BadRequest("no user has that token") }
+  if (user.refresh_tokens.revokedAt || user.refresh_tokens.expiresAt < new Date()) {
+    throw new Unauthorized("expired")
   }
-  const sanitized = header.replace("Bearer ", "").trim()
-  return sanitized;
+  const token = makeJWT(user.users.id, config.secret);
+
+  respondWithJSON(res, 200, {
+    token: token
+  })
 }
 
-export function makeRefreshToken() {
-  const buf = randomBytes(256);
-  const token = buf.toString("hex");
-  addRefreshToken(token)
-  return token;
+export async function handlerRevokeToken(req: Request, res: Response) {
+  const refreshToken = getBearerToken(req)
+
+  if (!refreshToken) { throw new BadRequest("Token does not exist") }
+
+  const user = await getUserFromRefreshToken(refreshToken)
+  if (!user) { throw new BadRequest("no user has that token") }
+
+  revokeToken(user.users.id)
+
+  res.sendStatus(204)
 }
