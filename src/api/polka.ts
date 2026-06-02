@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
-import { BadRequest, NotFoundError } from "./errors.js";
+import { BadRequest, NotFoundError, Unauthorized } from "./errors.js";
 import { upgradeChirp } from "../db/queries/users.js";
+import { getAPIKey } from "../auth.js";
+import { config } from "../config.js";
+
 export async function handlerPolkaWebhook(req: Request, res: Response) {
   type parameters = {
     event: string;
@@ -13,14 +16,18 @@ export async function handlerPolkaWebhook(req: Request, res: Response) {
 
   const { event, data } = params;
 
+  console.log(config.api.polkaKey, "polka")
+  let api = getAPIKey(req);
+
+  if (api !== config.api.polkaKey) {
+    throw new Unauthorized("Not authorized")
+  }
+
   if (event !== "user.upgraded") {
     res.sendStatus(204)
   } else {
     const response = upgradeChirp(data.userId)
     if (!response) { throw new NotFoundError("user not found") }
     res.sendStatus(204)
-
   }
-
-
 }

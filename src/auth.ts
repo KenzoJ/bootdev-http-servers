@@ -1,5 +1,5 @@
 import * as argon2 from "argon2";
-import { Unauthorized } from "./api/errors.js";
+import { BadRequest, Unauthorized } from "./api/errors.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 import { addRefreshToken } from "./db/queries/tokens.js";
@@ -71,5 +71,22 @@ export function getBearerToken(req: Request): string {
   }
   const sanitized = header.replace("Bearer ", "").trim()
   return sanitized;
+}
+
+export function getAPIKey(req: Request) {
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    throw new Unauthorized("Malformed authorization header");
+  }
+
+  return extractApiKey(authHeader);
+}
+
+export function extractApiKey(header: string) {
+  const splitAuth = header.split(" ");
+  if (splitAuth.length < 2 || splitAuth[0] !== "ApiKey") {
+    throw new BadRequest("Malformed authorization header");
+  }
+  return splitAuth[1];
 }
 
