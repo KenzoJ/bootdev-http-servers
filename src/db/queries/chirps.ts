@@ -28,3 +28,11 @@ export async function deleteChirp(id: string) {
   return result;
 }
 
+export async function getPostsByAuthorId(id: string) {
+  return db
+    .select()
+    .from(chirps)
+    .orderBy(asc(chirps.createdAt))
+    .where(eq(chirps.userId, id))
+}
+

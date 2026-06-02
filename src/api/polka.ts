@@ -27,6 +27,7 @@ export async function handlerPolkaWebhook(req: Request, res: Response) {
     res.sendStatus(204)
   } else {
     const response = upgradeChirp(data.userId)
+    console.log(response)
     if (!response) { throw new NotFoundError("user not found") }
     res.sendStatus(204)
   }

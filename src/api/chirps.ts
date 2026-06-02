@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
 import { BadRequest, Forbidden, NotFoundError, Unauthorized } from "./errors.js";
-import { getChirp, createChirp, getAllPosts, deleteChirp } from "../db/queries/chirps.js";
+import { getChirp, createChirp, getAllPosts, deleteChirp, getPostsByAuthorId } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
 import { getBearerToken } from "../auth.js";
@@ -107,5 +107,27 @@ export async function handlerDeleteChirp(req: Request, res: Response) {
   console.log(result)
   if (!result) { throw new NotFoundError("Not found") }
   res.sendStatus(204)
+
+}
+
+
+export async function handlerGetChirpsFromAuthor(req: Request, res: Response) {
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+
+  const allPosts = await getPostsByAuthorId(authorId)
+
+  if (typeof allPosts === 'undefined') {
+    throw new Forbidden("No posts to get")
+  }
+
+  for (let i = 0; allPosts.length < i; i++) {
+    console.log(allPosts[i])
+  }
+
+  respondWithJSON(res, 200, allPosts)
 
 }

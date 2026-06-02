@@ -5,7 +5,7 @@ import { handlerHits } from "./app/admin/metrics/index.js";
 import { handlerReset } from "./app/admin/metrics/reset.js"
 import { handlerLogin, handlerRefreshToken, handlerRevokeToken, handlerUpdate } from "./api/auth.js";
 import { handlerUsersCreate } from "./api/users.js"
-import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps, handlerDeleteChirp } from "./api/chirps.js";
+import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps, handlerDeleteChirp, handlerGetChirpsFromAuthor } from "./api/chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -43,11 +43,19 @@ app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(handlerRevokeToken(req, res)).catch(next);
 });
 app.get("/api/healthz", handlerReadiness);
+
 app.post("/api/chirps", (req, res, next) => {
   Promise.resolve(handlerChirpsCreate(req, res)).catch(next);
 });
-app.get("/api/chirps", (req, res, next) => {
-  Promise.resolve(handlerGetAllChirps(req, res)).catch(next);
+app.get("/api/chirps{/:authorId}", (req, res, next) => {
+  const { authorId } = req.params
+
+  if (authorId !== "no author") {
+    console.log("success!!!")
+    Promise.resolve(handlerGetChirpsFromAuthor(req, res)).catch(next);
+  } else {
+    Promise.resolve(handlerGetAllChirps(req, res)).catch(next);
+  }
 });
 app.get("/api/chirps/:chirpId", (req, res, next) => {
   Promise.resolve(handlerGetChirp(req, res)).catch(next)
