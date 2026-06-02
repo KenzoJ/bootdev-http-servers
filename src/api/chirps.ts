@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
-import { BadRequest, Forbidden, NotFoundError } from "./errors.js";
-import { getChirp, createChirp, getAllPosts } from "../db/queries/chirps.js";
+import { BadRequest, Forbidden, NotFoundError, Unauthorized } from "./errors.js";
+import { getChirp, createChirp, getAllPosts, deleteChirp } from "../db/queries/chirps.js";
 import { NewChirp } from "../db/schema.js";
 import { getUserById } from "../db/queries/users.js";
 import { getBearerToken } from "../auth.js";
@@ -89,3 +89,23 @@ function isParameters(value: unknown): value is Parameters {
   );
 }
 
+export async function handlerDeleteChirp(req: Request, res: Response) {
+  const { chirpId } = req.params;
+
+  if (typeof chirpId !== "string") {
+    throw new BadRequest("Invalid chirp id")
+  }
+
+  const bearerToken = getBearerToken(req)
+  const userId = validateJWT(bearerToken, config.secret);
+  if (!userId) { throw new Unauthorized("Incorrect bearer token") }
+  const chirp = await getChirp(chirpId)
+  if (chirp?.userId !== userId) { throw new Forbidden("Can't delete, wrong user") }
+
+  const result = await deleteChirp(chirpId)
+  console.log("result")
+  console.log(result)
+  if (!result) { throw new NotFoundError("Not found") }
+  res.sendStatus(204)
+
+}

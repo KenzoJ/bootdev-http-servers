@@ -5,7 +5,7 @@ import { handlerHits } from "./app/admin/metrics/index.js";
 import { handlerReset } from "./app/admin/metrics/reset.js"
 import { handlerLogin, handlerRefreshToken, handlerRevokeToken, handlerUpdate } from "./api/auth.js";
 import { handlerUsersCreate } from "./api/users.js"
-import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps } from "./api/chirps.js";
+import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps, handlerDeleteChirp } from "./api/chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -50,6 +50,9 @@ app.get("/api/chirps", (req, res, next) => {
 });
 app.get("/api/chirps/:chirpId", (req, res, next) => {
   Promise.resolve(handlerGetChirp(req, res)).catch(next)
+})
+app.delete("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(handlerDeleteChirp(req, res)).catch(next)
 })
 
 //ADMIN
