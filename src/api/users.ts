@@ -39,6 +39,7 @@ export async function handlerUsersCreate(req: Request, res: Response) {
     email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    isChirpyRed: user.isChirpyRed,
   } satisfies UserResponse);
 
 }

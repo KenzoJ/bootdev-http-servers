@@ -35,3 +35,14 @@ export async function updateInformation(id: string, email: string, pass: string)
     .where(eq(users.id, id));
   return result;
 }
+
+export async function upgradeChirp(id: string) {
+  const [result] = await db
+    .update(users)
+    .set({
+      isChirpyRed: true,
+    })
+    .where(eq(users.id, id))
+    .returning()
+  return result;
+}

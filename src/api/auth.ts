@@ -12,6 +12,7 @@ import { NewRefreshToken } from "../db/schema.js";
 
 
 type LoginResponse = UserResponse & {
+  isChirpyRed: boolean | null;
   token: string;
   refreshToken: string;
 }
@@ -47,6 +48,7 @@ export async function handlerLogin(req: Request, res: Response) {
     email: user.email,
     token: token,
     refreshToken: refreshToken,
+    isChirpyRed: user.isChirpyRed
   } satisfies LoginResponse);
 }
 
