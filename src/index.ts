@@ -3,7 +3,7 @@ import { handlerReadiness } from "./api/readiness.js"
 import { middlewareMetricsInc, middlewareLogResponses, errorMiddleware } from "./api/middleware.js"
 import { handlerHits } from "./app/admin/metrics/index.js";
 import { handlerReset } from "./app/admin/metrics/reset.js"
-import { handlerLogin, handlerRefreshToken, handlerRevokeToken } from "./api/auth.js";
+import { handlerLogin, handlerRefreshToken, handlerRevokeToken, handlerUpdate } from "./api/auth.js";
 import { handlerUsersCreate } from "./api/users.js"
 import { handlerGetChirp, handlerChirpsCreate, handlerGetAllChirps } from "./api/chirps.js";
 import postgres from "postgres";
@@ -29,6 +29,9 @@ app.post("/api/users", async (req, res, next) => {
     next(err)
   }
 })
+app.put("/api/users", (req, res, next) => {
+  Promise.resolve(handlerUpdate(req, res)).catch(next);
+});
 app.post("/api/login", (req, res, next) => {
   Promise.resolve(handlerLogin(req, res)).catch(next);
 });

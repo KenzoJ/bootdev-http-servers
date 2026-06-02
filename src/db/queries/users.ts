@@ -26,3 +26,12 @@ export async function getUserById(id: string) {
   return result;
 }
 
+export async function updateInformation(id: string, email: string, pass: string) {
+  const [result] = await db.update(users)
+    .set({
+      email,
+      hashedPassword: pass,
+    })
+    .where(eq(users.id, id));
+  return result;
+}
