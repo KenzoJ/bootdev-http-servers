@@ -47,11 +47,10 @@ app.get("/api/healthz", handlerReadiness);
 app.post("/api/chirps", (req, res, next) => {
   Promise.resolve(handlerChirpsCreate(req, res)).catch(next);
 });
-app.get("/api/chirps{/:authorId}", (req, res, next) => {
-  const { authorId } = req.params
+app.get("/api/chirps", (req, res, next) => {
+  const { authorId } = req.query
 
-  if (authorId !== "no author") {
-    console.log("success!!!")
+  if (authorId) {
     Promise.resolve(handlerGetChirpsFromAuthor(req, res)).catch(next);
   } else {
     Promise.resolve(handlerGetAllChirps(req, res)).catch(next);

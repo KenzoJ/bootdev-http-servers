@@ -1,5 +1,5 @@
 import { db } from "../index.js";
-import { asc } from "drizzle-orm"
+import { asc, desc } from "drizzle-orm"
 import { chirps, NewChirp } from "../schema.js";
 import { eq } from 'drizzle-orm'
 
@@ -11,8 +11,13 @@ export async function createChirp(chirp: NewChirp) {
     .returning();
   return result;
 }
-export async function getAllPosts() {
-  return db.select().from(chirps).orderBy(asc(chirps.createdAt))
+
+export async function getAllPosts(sort: string) {
+  if (sort === "asc") {
+    return db.select().from(chirps).orderBy(asc(chirps.createdAt))
+  } else {
+    return db.select().from(chirps).orderBy(desc(chirps.createdAt))
+  }
 }
 
 export async function getChirp(id: string) {
@@ -34,5 +39,6 @@ export async function getPostsByAuthorId(id: string) {
     .from(chirps)
     .orderBy(asc(chirps.createdAt))
     .where(eq(chirps.userId, id))
+
 }
 

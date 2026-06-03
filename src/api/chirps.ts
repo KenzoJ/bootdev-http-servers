@@ -36,8 +36,13 @@ export async function handlerChirpsCreate(req: Request, res: Response) {
   respondWithJSON(res, 201, newChirp)
 }
 
-export async function handlerGetAllChirps(_: Request, res: Response) {
-  const allPosts = await getAllPosts()
+export async function handlerGetAllChirps(req: Request, res: Response) {
+  let sort = "asc"
+  if (req.query.sort === "desc") {
+    sort = "desc"
+  }
+
+  const allPosts = await getAllPosts(sort)
 
   if (typeof allPosts === 'undefined') {
     throw new Forbidden("No posts to get")
@@ -117,7 +122,6 @@ export async function handlerGetChirpsFromAuthor(req: Request, res: Response) {
   if (typeof authorIdQuery === "string") {
     authorId = authorIdQuery;
   }
-
   const allPosts = await getPostsByAuthorId(authorId)
 
   if (typeof allPosts === 'undefined') {
@@ -131,3 +135,10 @@ export async function handlerGetChirpsFromAuthor(req: Request, res: Response) {
   respondWithJSON(res, 200, allPosts)
 
 }
+
+
+
+
+
+
+
